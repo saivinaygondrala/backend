@@ -32,7 +32,11 @@ app.post("/login", async (req, res) => {
     if (!usr) {
       return res.status(404).json({ message: "User Not Found!" });
     }
+<<<<<<< HEAD
     res.status(200).json({ loginToken: usr._id, username: usr.username });
+=======
+    res.status(200).json(usr._id);
+>>>>>>> 63a859e29bb65750c9e9fd69a0ec96fe57191cfc
   } catch (error) {
     res.status(500).json({ message: error.message });
     console.log("Error in login endpoint");
@@ -63,6 +67,7 @@ app.get("/get-my-journal/:username", async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 app.get("/get-journal-by-id/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -76,6 +81,22 @@ app.get("/get-journal-by-id/:id", async (req, res) => {
     console.log("Error in get-journal-by-id endpoint");
   }
 });
+=======
+app.get("/get-journal-by-id/:id", async (req, res)=>{
+  const {id} = req.params;
+  try{
+    const jrnl = await Journal.findOne({_id:id});
+    if(!jrnl){
+      return res.status(404).json({message: "Journal not found."});
+    }
+    res.status(200).json(jrnl);
+  }
+  catch(error){
+    res.status(500).json({message: error.message});
+    console.log("Error in get-journal-by-id endpoint");
+  }
+})
+>>>>>>> 63a859e29bb65750c9e9fd69a0ec96fe57191cfc
 
 app.post("/signup", async (req, res) => {
   try {
@@ -151,7 +172,11 @@ app.delete("/delete-journal/:id", async (req, res) => {
     } else {
       const jrnl = await Journal.findByIdAndDelete(id);
       if (!jrnl) {
+<<<<<<< HEAD
         console.log("Unable to delete Journal");
+=======
+      console.log("Unable to delete Journal");
+>>>>>>> 63a859e29bb65750c9e9fd69a0ec96fe57191cfc
 
         return res.status(404).json({ message: "Journal Not Found" });
       }
