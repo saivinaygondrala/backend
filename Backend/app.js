@@ -4,12 +4,12 @@ const cors = require("cors");
 const user = require("./models/user.model");
 const Journal = require("./models/journal.model");
 const app = express();
-require('dotenv').config();
+require("dotenv").config();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
-app.use(express.urlencoded({extended:false}))
+app.use(express.urlencoded({ extended: false }));
 
 mongoose
   .connect(process.env.MONGO_CONNECTION_STRING)
@@ -26,13 +26,13 @@ app.get("/", (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const {username} = req.body;
-    const {password} = req.body;
-    const usr = await user.findOne({username: username, password:password});
-    if(!usr){
-        return res.status(404).json({message:"User Not Found!"});
+    const { username } = req.body;
+    const { password } = req.body;
+    const usr = await user.findOne({ username: username, password: password });
+    if (!usr) {
+      return res.status(404).json({ message: "User Not Found!" });
     }
-    res.status(200).json(usr);
+    res.status(200).json({ loginToken: usr._id, username: usr.username });
   } catch (error) {
     res.status(500).json({ message: error.message });
     console.log("Error in login endpoint");
@@ -63,9 +63,24 @@ app.get("/get-my-journal/:username", async (req, res) => {
   }
 });
 
+app.get("/get-journal-by-id/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const jrnl = await Journal.findOne({ _id: id });
+    if (!jrnl) {
+      return res.status(404).json({ message: "Journal not found." });
+    }
+    res.status(200).json(jrnl);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log("Error in get-journal-by-id endpoint");
+  }
+});
+
 app.post("/signup", async (req, res) => {
   try {
     const usr = await user.create(req.body);
+    console.log(usr);
     res.status(200).json({ message: "Registered successfully." });
   } catch (error) {
     console.log("Error in signup endpoint");
@@ -126,36 +141,42 @@ app.put("/update-journal-by-id/:id", async (req, res) => {
 });
 
 // Delete Journal
-app.delete("/delete-journal/:id", async (req, res)=>{
-    try{
-        const {id} = req.params;
-        const jrnl = await Journal.findByIdAndDelete(id);
-        if(!jrnl){
-            return res.status(404).json({message:"Journal Not Found"});
-        }
-        res.status(200).json({message: "Journal deleted successfully."});
+app.delete("/delete-journal/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const jrns = await Journal.findById(id);
+    if (!jrns) {
+      console.log("No Journal Found");
+      return res.status(404).json({ message: "Journal Not Found" });
+    } else {
+      const jrnl = await Journal.findByIdAndDelete(id);
+      if (!jrnl) {
+        console.log("Unable to delete Journal");
+
+        return res.status(404).json({ message: "Journal Not Found" });
+      }
+      res.status(200).json({ message: "Journal deleted successfully." });
     }
-    catch(error){
-        res.status(500).json({message: error.message});
-        console.log("Error in deleting Journal endpoint.");
-    }
-})
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log("Error in deleting Journal endpoint.");
+  }
+});
 
 // Delete User
-app.delete("/delete-user/:id", async (req, res)=>{
-    try{
-        const {id} = req.params;
-        const usr = await user. findByIdAndDelete(id);
-        if(!usr){
-            return res.status(404).json({message:"User Not Found"});
-        }
-        res.status(200).json({message:"User deleted Successfully"})
+app.delete("/delete-user/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usr = await user.findByIdAndDelete(id);
+    if (!usr) {
+      return res.status(404).json({ message: "User Not Found" });
     }
-    catch(error){
-        res.status(500).json({message: error.message});
-        console.log("Error in deleting user endpoint.")
-    }
-})
+    res.status(200).json({ message: "User deleted Successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+    console.log("Error in deleting user endpoint.");
+  }
+});
 
 app.listen(3000, () => {
   console.log("Server is connected successfully.");

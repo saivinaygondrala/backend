@@ -25,15 +25,15 @@ const journalSchema = mongoose.Schema(
     },
     references: {
       type: [String],
-      required: false, // Omit this field if references are optional
+      required: false,
     },
     authors: {
-      type: [String], // Simple array of strings for author names
+      type: [String],
       required: true,
     },
   },
   {
-    timestamps: true, // Automatically add createdAt and updatedAt
+    timestamps: true,
   }
 );
 
