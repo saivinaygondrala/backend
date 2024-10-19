@@ -11,6 +11,11 @@ const journalSchema = mongoose.Schema(
       required: true,
       minlength: [20, "Title must be at least 20 characters long"],
     },
+    content: {
+      type: String,
+      required: true,
+      minlength: [200, "Content must be at least of 200 characters long"],
+    },
     abstract: {
       type: String,
       required: true,
